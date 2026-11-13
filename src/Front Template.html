@@ -1,3 +1,6 @@
+<!---------
+Orixinal: https://github.com/muctebanesiri/anki-multiple-choice-question-template/tree/main
+--------------->
 <div id="myCard">
   <div class="front">
   <div style='font-family:"Arial";font-size:25px;font-weight:bold'>{{Question}}</div>
@@ -7,10 +10,6 @@
     {{#option_2 (B)}}<div class="container" id="B"><input type="checkbox" name="radAnswer" class="checkbox" id="B"><div class="option">{{option_2 (B)}}</div></div>{{/option_2 (B)}}
     {{#option_3 (C)}}<div class="container" id="C"><input type="checkbox" name="radAnswer" class="checkbox" id="C"><div class="option">{{option_3 (C)}}</div></div>{{/option_3 (C)}}
     {{#option_4 (D)}}<div class="container" id="D"><input type="checkbox" name="radAnswer" class="checkbox" id="D"><div class="option">{{option_4 (D)}}</div></div>{{/option_4 (D)}}
-    {{#option_5 (E)}}<div class="container" id="E"><input type="checkbox" name="radAnswer" class="checkbox" id="E"><div class="option">{{option_5 (E)}}</div></div>{{/option_5 (E)}}
-    {{#option_6 (F)}}<div class="container" id="F"><input type="checkbox" name="radAnswer" class="checkbox" id="F"><div class="option">{{option_6 (F)}}</div></div>{{/option_6 (F)}}
-    {{#option_7 (G)}}<div class="container" id="G"><input type="checkbox" name="radAnswer" class="checkbox" id="G"><div class="option">{{option_7 (G)}}</div></div>{{/option_7 (G)}}
-    {{#option_8 (H)}}<div class="container" id="H"><input type="checkbox" name="radAnswer" class="checkbox" id="H"><div class="option">{{option_8 (H)}}</div></div>{{/option_8 (H)}}
   </form>
   </div>
   <div id="settings">
@@ -47,11 +46,8 @@
 //--------------------------persistance
 if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var i=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",i);i>0&&n>0&&n-i<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
 //---------------------------variables
-var X = "{{Ans}}";
-if (X == X.toLowerCase()) {
-  var X = X.toUpperCase()
-}
-var Y = Number(X);
+var correctAnswer = "{{Answer}}".trim().toUpperCase();
+var Y = Number(correctAnswer);
 var k = "value";
 var answer =""
 var checkbox = document.getElementsByTagName("input");
@@ -93,12 +89,12 @@ $('#negative').on('click', function(){
 $('#gear').on('click', function(){
   $('#settings-content').toggle(50);
   setTimeout(
-  function() 
+  function()
   {
     $('#myCard').scrollTop($('#myCard')[0].scrollHeight);
   }, 100)
-  
-  
+
+
 })
 
 //-------------------------------------functions
@@ -108,34 +104,30 @@ document.getElementById("myCard").onscroll = function(){
 };
 
 function ToggleCheck() {
-var mycheckBox = $("input[type='checkbox']#"+this.id);
-var cont = $(".container#"+this.id);
-mycheckBox.attr("checked", !mycheckBox.attr("checked"));
-console.log(cont)
-cont.toggleClass("check")
+  var mycheckBox = $("input[type='checkbox']#"+this.id);
+  var cont = $(".container#"+this.id);
+  mycheckBox.attr("checked", !mycheckBox.attr("checked"));
+  console.log("cont: " + cont)
+  cont.toggleClass("check")
 }
 
-// function storeAnswer() {
-//   var a = this.id;
-//   Persistence.setItem("answer",a);
-//   console.log(a)
-// }
+
 function storeAnswerBox() {
   answer=""
-for (var i=0, iLen=option.length; i<iLen; i++) {
+  for (var i=0, iLen=option.length; i<iLen; i++) {
     if (checkbox[i].checked) {
-      
+
       answer=answer+checkbox[i].id;
     }
   }
   Persistence.setItem("answer",answer);
-  console.log(answer)
+  console.log("answer: " + answer)
 
 }
 
 function flipToBack() {
 
- setTimeout(function() {
+setTimeout(function() {
 
 if (typeof pycmd !== "undefined") {
       pycmd("ans")
@@ -152,10 +144,10 @@ if (typeof pycmd !== "undefined") {
         }
       }
     }
-  
 
- }, 50)}
-  
+
+}, 50)}
+
 function shuffle(elems) {
   allElems = (function() {
     var ret = [],
@@ -174,7 +166,7 @@ function shuffle(elems) {
         allElems.splice(random, 1);
         ret[ret.length] = randEl;
         Persistence.setItem("order"+l,random);
-        console.log(random);
+        console.log("random: " + random);
       }
       return ret;
     })(),
@@ -183,23 +175,23 @@ function shuffle(elems) {
     elems[l].parentNode.insertBefore(shuffled[l], elems[l].nextSibling);
     elems[l].parentNode.removeChild(elems[l]);
   }
-  
+
 }
 
 function reverseShuffle(elems) {
   allElems = (function() {
-    
+
     var ret = [],
       l = DefElems.length;
     while (l--) {
       ret[ret.length] = DefElems[l];
     }
     return ret;
-    
+
   })();
-  console.log(allElems)
-  
- var shuffled = (function() {
+  console.log("allElems: " + allElems)
+
+var shuffled = (function() {
       var l = allElems.length,
         ret = [];
       while (l--) {
@@ -208,7 +200,7 @@ function reverseShuffle(elems) {
         allElems.splice(random, 1);
         ret[ret.length] = randEl;
         Persistence.setItem("order"+l,random);
-        console.log(random);
+        console.log("random: " + random);
       }
       return ret;
     })(),
@@ -234,7 +226,7 @@ function HandleShufflingBox(){
 
 function HandleSubmitBox(){
   Persistence.setItem("SubmitBox", $("#Auto_submit").is(":checked"));
-  if($("#Auto_submit").is(":checked") && X.length==1){
+  if($("#Auto_submit").is(":checked") && correctAnswer.length==1){
     for (i = 0; i < container.length; i++) {
     container[i].addEventListener("click", flipToBack);
     }
@@ -254,7 +246,7 @@ if( Persistence.getItem("SubmitBox")==null || Persistence.getItem("ShufflingBox"
 
   for (i = 1; i < container.length+1; i++) {
   $(".container:nth-of-type("+i+") .option").prepend("<span class='Letters'>("+String.fromCharCode(64+i)+")&nbsp;</span>");
-  
+
   }
 
 document.querySelector("#Shuffling").addEventListener("click",HandleShufflingBox)
@@ -271,7 +263,7 @@ if($("#Shuffling").is(":checked")){
 
 function HandelEvents(){
 
-if(X.length==1  && $("#Auto_submit").is(":checked")){
+if(correctAnswer.length==1  && $("#Auto_submit").is(":checked")){
   for (i = 0; i < container.length; i++) {
     container[i].addEventListener("click", ToggleCheck);
     container[i].addEventListener("click", storeAnswerBox);
@@ -300,15 +292,20 @@ function deselect(){
 
 $(document).on("mouseup", function (e) {
     var selected = window.getSelection();
-    var range = selected.getRangeAt(0);
-    if(selected.toString().length > 0){
+
+    if (selected.toString().length > 0 && selected.rangeCount > 0) {
+        var range = selected.getRangeAt(0);
         var newNode = document.createElement("span");
+
         newNode.setAttribute("class", "highlighted");
-        newNode.addEventListener("click", deselect)
-        range.surroundContents(newNode); 
+        newNode.addEventListener("click", deselect);
 
+        // Safely extract the selection (even across multiple tags) and wrap it
+        var fragment = range.extractContents();
+        newNode.appendChild(fragment);
+        range.insertNode(newNode);
+
+        selected.removeAllRanges();
     }
-
-    
- });
+});
 </script>

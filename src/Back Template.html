@@ -1,3 +1,7 @@
+<!---------
+Custom
+Orixinal: https://github.com/muctebanesiri/anki-multiple-choice-question-template/tree/main
+--------------->
 <div id="myCard">
   <div class="back">
     <div style='font-family: "Arial"; font-size: 25px;'></div>
@@ -7,10 +11,6 @@
     {{#option_2 (B)}}<div class="container" id="B"><div class="circle"></div><div  class="option">{{option_2 (B)}}</div></div>{{/option_2 (B)}}
     {{#option_3 (C)}}<div class="container" id="C"><div class="circle"></div><div  class="option">{{option_3 (C)}}</div></div>{{/option_3 (C)}}
     {{#option_4 (D)}}<div class="container" id="D"><div class="circle"></div><div  class="option">{{option_4 (D)}}</div></div>{{/option_4 (D)}}
-    {{#option_5 (E)}}<div class="container" id="E"><div class="circle"></div><div  class="option">{{option_5 (E)}}</div></div>{{/option_5 (E)}}
-    {{#option_6 (F)}}<div class="container" id="F"><div class="circle"></div><div  class="option">{{option_6 (F)}}</div></div>{{/option_6 (F)}}
-    {{#option_7 (G)}}<div class="container" id="G"><div class="circle"></div><div  class="option">{{option_7 (G)}}</div></div>{{/option_7 (G)}}
-    {{#option_8 (H)}}<div class="container" id="H"><div class="circle"></div><div  class="option">{{option_8 (H)}}</div></div>{{/option_8 (H)}}
     </form>
     <div id="extra-section">
               <div id="extra-header" class="header header-yellow" onclick="$('#extra').toggle(100)">
@@ -20,7 +20,7 @@
                   <div>{{Explanation}}</div>
               </div>
     </div>
-  
+
 </div>
   <div id="settings">
     <div id="gear">
@@ -70,12 +70,9 @@ $("#extra-header").hide();
 //-----------------------------------------------varibales
 document.getElementById("myCard").scrollTop = Persistence.getItem("scroll")
 var answer = Persistence.getItem("answer");
-console.log(answer);
-var X = "{{Ans}}";
-if (X == X.toLowerCase()) {
-  var X = X.toUpperCase()
-}
-var Y = Number(X);
+console.log("Persisted answer: " + answer);
+var correctAnswer = "{{Answer}}".trim().toUpperCase();
+var Y = Number(correctAnswer);
 var k = "value";
 var K1 ="valueC";
 var accepted = "undifend";
@@ -109,12 +106,12 @@ $('#negative').on('click', function(){
 $('#gear').on('click', function(){
   $('#settings-content').toggle(50);
   setTimeout(
-  function() 
+  function()
   {
     $('#myCard').scrollTop($('#myCard')[0].scrollHeight);
   }, 100)
-  
-  
+
+
 })
 //-------------------------------------------------------------functions
 function shuffle(elems) {
@@ -134,7 +131,7 @@ function shuffle(elems) {
           var randEl = allElems[random].cloneNode(true);
           allElems.splice(random, 1);
           ret[ret.length] = randEl;
-          console.log(random);
+          console.log("random: " + random);
         }
         return ret;
       })(),
@@ -147,17 +144,17 @@ function shuffle(elems) {
 
 function reverseShuffle(elems) {
   allElems = (function() {
-    
+
     var ret = [],
       l = DefElems.length;
     while (l--) {
       ret[ret.length] = DefElems[l];
     }
     return ret;
-    
+
   })();
-  console.log(allElems)
-  
+  console.log("allElems:" + allElems)
+
  var shuffled = (function() {
       var l = allElems.length,
         ret = [];
@@ -166,7 +163,7 @@ function reverseShuffle(elems) {
           randEl = allElems[random].cloneNode(true);
         allElems.splice(random, 1);
         ret[ret.length] = randEl;
-        console.log(random);
+        console.log("random: " + random);
       }
       return ret;
     })(),
@@ -177,7 +174,7 @@ function reverseShuffle(elems) {
   }
 }
 
- 
+
 
 //-------------------------------------------------------------------------------------------
 //select wrong answers
@@ -192,10 +189,10 @@ for(i = 0; i < answer.length; i++) {
 }
 //select right answers
 if(isNaN(Y)){
-        for(i = 0; i < X.length; i++) {
+        for(i = 0; i < correctAnswer.length; i++) {
             console.log("first method");
-            Xs=X.split('')[i]
-            console.log(Xs)
+            Xs=correctAnswer.split('')[i]
+            console.log("Xs: " + Xs)
             if(Xs==" "){}else{
                           $("#"+Xs+">.circle").empty()
             $("#"+Xs+">.circle").append(TrueSVG);
@@ -205,9 +202,9 @@ if(isNaN(Y)){
 };
     }
 else
-    {for(i = 0; i < X.length; i++) {
+    {for(i = 0; i < correctAnswer.length; i++) {
             console.log("second method");
-            Xs=X.split('')
+            Xs=correctAnswer.split('')
             if(Xs==" "){}else{
             converted=String.fromCharCode(Number(Xs[i]) + 64);
             $("#"+converted+">.circle").empty()
@@ -218,7 +215,7 @@ else
 var DefElems = document.querySelectorAll('#shuffle > div');
 for (i = 1; i < container.length+1; i++) {
   $(".container:nth-of-type("+i+") .option").prepend("<span class='Letters'>("+String.fromCharCode(64+i)+")&nbsp;</span>");
-  
+
   }
 
 function HandleShufflingBox(){
