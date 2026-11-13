@@ -1,146 +1,89 @@
 <!---------
+BACK TEMPLATE
 Custom
 Orixinal: https://github.com/muctebanesiri/anki-multiple-choice-question-template/tree/main
 --------------->
 <div id="myCard">
-<div class="back">
-<div style='font-family:"Arial";font-size:25px;font-weight:bold'>{{Question}}</div>
-<br>
-<form id="shuffle">
-{{#option_1 (A)}}<div class="container" data-letter="A"><div class="circle"></div><div class="option">{{option_1 (A)}}</div></div>{{/option_1 (A)}}
-{{#option_2 (B)}}<div class="container" data-letter="B"><div class="circle"></div><div class="option">{{option_2 (B)}}</div></div>{{/option_2 (B)}}
-{{#option_3 (C)}}<div class="container" data-letter="C"><div class="circle"></div><div class="option">{{option_3 (C)}}</div></div>{{/option_3 (C)}}
-{{#option_4 (D)}}<div class="container" data-letter="D"><div class="circle"></div><div class="option">{{option_4 (D)}}</div></div>{{/option_4 (D)}}
-</form>
+  <main class="back">
+    <div class="question">{{Question}}</div>
+    <div id="options">
+      {{#A}}<div class="option" data-letter="A"><div class="text">{{A}}</div></div>{{/A}}
+      {{#B}}<div class="option" data-letter="B"><div class="text">{{B}}</div></div>{{/B}}
+      {{#C}}<div class="option" data-letter="C"><div class="text">{{C}}</div></div>{{/C}}
+      {{#D}}<div class="option" data-letter="D"><div class="text">{{D}}</div></div>{{/D}}
+    </div>
 
-<div id="extra-section">
-<div id="extra-header" class="header header-yellow">Explanation</div>
-<div id="extra" class="content"><div>{{Explanation}}</div></div>
-</div>
-</div>
+    {{#Explanation}}
+    <details class="explanation" open>
+      <summary>Explanation</summary>
+      <div>{{Explanation}}</div>
+    </details>
+    {{/Explanation}}
+  </main>
 
-<div id="settings">
-<div id="gear"><!-- gear svg, unchanged --></div>
-<div id="settings-content" style="display:none">
-<div id="zoom">
-<div id="positive"><!-- svg, unchanged --></div>
-<div id="default"><!-- svg, unchanged --></div>
-<div id="negative"><!-- svg, unchanged --></div>
-</div>
-<div id="switch">
-<div class="check-box">
-<label for="Shuffling">Shuffling</label>
-<input id="Shuffling" type="checkbox">
-</div>
-</div>
-</div>
-</div>
+  <div id="settings">
+    <button id="gear">⚙</button>
+    <div id="panel">
+      <button id="zoom-out">−</button>
+      <button id="zoom-reset">100%</button>
+      <button id="zoom-in">+</button>
+      <label>Shuffling <input id="shuffling" type="checkbox"></label>
+    </div>
+  </div>
 </div>
 
+<!--
+Persistence script for storing the shuffled answers and settings like zoom level or auto-submit and shuffle toggles
+Script taken from https://github.com/SimonLammer/anki-persistence/releases/tag/v1.1.8
+The .js file must exist in ~/.local/share/Anki2/User\ 1/collection.media/
+-->
+<script src="_persistence.js"></script>
 <script>
-//-------------------------- persistence
-if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var i=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",i);i>0&&n>0&&n-i<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const store = (k, d) => { const v = Persistence.getItem(k); return v == null ? d : v; };
 
+  const opts = $("#options");
+  const items = [...opts.children];
+  const shuffling = $("#shuffling");
 
-(function () {
-  const $ = (sel) => document.querySelector(sel);
-  const card = $("#myCard");
-  const back = $(".back");
-  const form = $("#shuffle");
-  const settings = $("#settings-content");
-  const shuffling = $("#Shuffling");
+  // ----- mark right / wrong ("B" or "2" both work)
+  const raw = "{{text:Answer}}".trim().toUpperCase();
+  const correct = /^\d$/.test(raw) ? "ABCD"[raw - 1] : raw;
+  const picked = store("answer", "");
 
-  const TRUE_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 90 90">' +
-    '<circle cx="45" cy="45" r="45" fill="#059862"/>' +
-    '<path fill="#fff" d="M38.478 66c-1.733-.012-3.377-.771-4.508-2.085L20.453 48.263c-2.162-2.511-1.879-6.299.632-8.462 2.51-2.163 6.299-1.879 8.462.632l8.991 10.441 21.967-24.848c2.194-2.485 5.988-2.716 8.469-.521 2.483 2.195 2.717 5.986.521 8.469l-26.522 30C41.834 65.263 40.197 66 38.478 66z"/></svg>';
-  const FALSE_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 90 90">' +
-    '<circle cx="45" cy="45" r="45" fill="#ff595a"/>' +
-    '<path d="M29 66L61 34M61 66L29 34" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>';
-
-  function toggle(el) {
-    const hidden = getComputedStyle(el).display === "none";
-    el.style.display = hidden ? "" : "none";
-    if (hidden && getComputedStyle(el).display === "none") el.style.display = "block";
-  }
-
-  const load = (key, fallback) => {
-    const v = Persistence.getItem(key);
-    return v == null ? fallback : v;
-  };
-
-  //-------------------------- cleanup
-  form.querySelectorAll(".option:empty").forEach((o) => o.parentNode.remove());
-  const items = Array.from(form.children); // original order
-
-  const extra = $("#extra");
-  if (!extra.textContent.trim() && !extra.querySelector("img")) {
-    $("#extra-header").style.display = "none";
-  } else {
-    $("#extra-header").onclick = () => toggle(extra);
-  }
-
-  card.scrollTop = load("scroll", 0);
-
-  //-------------------------- mark right / wrong answers
-  const correct = new Set(
-    "{{Answer}}".trim().toUpperCase().split("").map((c) =>
-      /\d/.test(c) ? String.fromCharCode(64 + Number(c)) : c // allow "13" as well as "AC"
-    )
-  );
-  const selected = load("answer", "");
-
-  items.forEach((item) => {
-    const letter = item.dataset.letter;
-    const circle = item.querySelector(".circle");
-    if (correct.has(letter)) {
-      circle.innerHTML = TRUE_SVG;
-      item.querySelector(".option").classList.add("true");
-    } else if (selected.includes(letter)) {
-      circle.innerHTML = FALSE_SVG;
-    }
-
-    const tag = document.createElement("span");
-    tag.className = "Letters";
-    tag.textContent = "(" + letter + ")\u00a0";
-    item.querySelector(".option").prepend(tag);
+  items.forEach((o) => {
+    const l = o.dataset.letter;
+    o.classList.toggle("correct", l === correct);
+    o.classList.toggle("wrong", l === picked && l !== correct);
   });
 
-  //-------------------------- shuffling (reuses the order chosen on the front)
-  const saved = String(load("order", ""))
+  // ----- order chosen on the front
+  const saved = String(store("order", ""))
     .split("")
-    .map((l) => items.find((i) => i.dataset.letter === l))
+    .map((l) => items.find((o) => o.dataset.letter === l))
     .filter(Boolean);
-  const shuffledOrder = saved.length === items.length ? saved : items;
 
-  function applyOrder(shuffled) {
-    (shuffled ? shuffledOrder : items).forEach((el) => form.appendChild(el));
-    form.querySelectorAll(".Letters").forEach((s) => (s.style.display = shuffled ? "none" : ""));
+  function applyOrder() {
+    const shuffled = shuffling.checked && saved.length === items.length;
+    (shuffled ? saved : items).forEach((el) => opts.appendChild(el));
+    opts.classList.toggle("shuffled", shuffled);
   }
+  shuffling.checked = store("ShufflingBox", true);
+  shuffling.onchange = () => { Persistence.setItem("ShufflingBox", shuffling.checked); applyOrder(); };
+  applyOrder();
 
-  shuffling.checked = load("ShufflingBox", true);
-  shuffling.addEventListener("change", () => {
-    Persistence.setItem("ShufflingBox", shuffling.checked);
-    applyOrder(shuffling.checked);
-  });
-  applyOrder(shuffling.checked);
-
-  //-------------------------- zoom + settings
-  let zoom = load("Zoom", 1);
-  function setZoom(z) {
+  // ----- zoom + settings
+  let zoom = store("Zoom", 1);
+  const setZoom = (z) => {
     zoom = Math.max(0.3, Math.round(z * 10) / 10);
     Persistence.setItem("Zoom", zoom);
-    back.style.zoom = zoom;
-  }
-  setZoom(zoom);
-  $("#positive").onclick = () => setZoom(zoom + 0.1);
-  $("#default").onclick = () => setZoom(1);
-  $("#negative").onclick = () => setZoom(zoom - 0.1);
-
-  $("#gear").onclick = () => {
-    toggle(settings);
-    setTimeout(() => (card.scrollTop = card.scrollHeight), 100);
+    document.documentElement.style.setProperty("--zoom", zoom);
   };
+  setZoom(zoom);
+  $("#zoom-in").onclick = () => setZoom(zoom + 0.1);
+  $("#zoom-out").onclick = () => setZoom(zoom - 0.1);
+  $("#zoom-reset").onclick = () => setZoom(1);
+  $("#gear").onclick = () => $("#panel").classList.toggle("open");
 })();
 </script>

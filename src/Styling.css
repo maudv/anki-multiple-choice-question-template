@@ -1,258 +1,189 @@
-/* ---------- card + layout (LTR) ---------- */
+:root {
+    --ok-bg: #c7f1dc;
+    --accent: #3B99FC;
+    --ok: #059862;
+    --bad: #ff595a;
+    --warn: #f4b400;
+}
+
+.nightMode {
+    --ok-bg: #245953;
+}
+
+/* no color/background here: let Anki's night mode handle them */
 .card {
     font-family: 'Noto Sans', sans-serif;
-    font-size: 20px;
-    direction: ltr;
+    font-size: calc(20px * var(--zoom, 1));
     text-align: left;
-    color: black;
-    background-color: white;
     margin: 2vh 1vw;
 }
 
 #myCard {
     display: flex;
     flex-direction: column;
-    overflow: auto;
     min-height: 96vh;
 }
 
-#myCard>div:first-child {
-    flex: 12;
+#myCard>main {
+    flex: 1;
 }
 
-#myCard>div:last-child {
-    padding-top: 1em;
+.question {
+    font: bold 1.25em Arial, sans-serif;
+    margin-bottom: 1em;
 }
 
 /* ---------- options ---------- */
-.container {
+.option {
     display: flex;
     align-items: center;
-    padding: .5em;
+    gap: .6em;
     width: fit-content;
-}
-
-.front .container {
+    padding: .5em .8em;
+    margin: .1em 0;
+    border-radius: .4em;
     cursor: pointer;
 }
 
-.back .container {
-    margin-left: 17px;
+.back .option {
+    cursor: default;
 }
 
-#shuffle>.container .option {
-    position: relative;
-    padding: .5em .8em;
-    border-radius: .4em;
-}
-
-#shuffle>.container .option p {
+.option .text p {
     margin: 0;
 }
 
-.container input[type="checkbox"] {
-    display: none;
+/* marker circle: shows the letter, or ✓ / ✗ on the back */
+.option::before {
+    content: attr(data-letter);
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.7em;
+    height: 1.7em;
+    box-sizing: border-box;
+    border: 2px solid #888;
+    border-radius: 50%;
+    font-size: .8em;
+    color: #888;
+    transition: background .15s, border-color .15s;
 }
 
-/* custom checkbox (front) */
-.front .container::before {
+.shuffled .option::before {
     content: "";
-    flex-shrink: 0;
-    height: 1.15em;
-    width: 1.15em;
-    margin-right: .6em;
-    color: rgba(0, 0, 0, .275);
-    border: solid .06em;
-    border-radius: .2em;
-    box-shadow: 0 0 .04em, 0 .06em .16em -.03em inset, 0 0 0 .07em transparent inset;
-    background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xml:space="preserve" fill="white" viewBox="0 0 9 9"><rect x="0" y="4.3" transform="matrix(-0.707 -0.7072 0.7072 -0.707 0.5891 10.4702)" width="4.3" height="1.6" /><rect x="2.2" y="2.9" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 12.1877 2.9833)" width="6.1" height="1.7" /></svg>') no-repeat center, white;
-    background-size: 0;
-    transition: color .1s, border .1s, background .15s, box-shadow .1s;
 }
 
-.front .container.check::before {
-    background-color: #3B99FC;
-    background-size: .75em;
-    color: rgba(0, 0, 0, .075);
+.front .option.selected::before {
+    background: var(--accent);
+    border-color: var(--accent);
 }
 
-/* spacer so back rows are as tall as the ✓/✗ icon */
-.back .container::before {
-    content: "";
-    height: 25.38px;
+.back .option.correct {
+    background: var(--ok-bg);
 }
 
-/* ✓ / ✗ icon slot (back) */
-.circle {
-    position: relative;
-    top: -3px;
-    left: -15px;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    transform: scale(1.2);
+.back .option.correct::before,
+.back .option.wrong::before {
+    color: #fff;
+    font-weight: bold;
 }
 
-.true {
-    background: #c7f1dc;
+.back .option.correct::before {
+    content: "✓";
+    background: var(--ok);
+    border-color: var(--ok);
 }
 
-body.nightMode .true {
-    background: #245953;
-}
-
-.highlighted {
-    background-color: yellow;
-}
-
-.nightMode .highlighted {
-    background-color: #f4b400;
+.back .option.wrong::before {
+    content: "✗";
+    background: var(--bad);
+    border-color: var(--bad);
 }
 
 /* ---------- explanation ---------- */
-#extra-section {
-    cursor: pointer;
+.explanation {
+    margin-top: 1.5em;
 }
 
-.header {
+.explanation summary {
+    cursor: pointer;
+    color: var(--warn);
+    border-left: 4px solid var(--warn);
     padding-left: .5em;
 }
 
-.header-yellow {
-    border-left: 4px solid #f4b400;
-    color: #f4b400;
-}
-
-.content {
+.explanation>div {
     padding-left: .5em;
     border-left: 4px solid transparent;
 }
 
-/* ---------- settings panel ---------- */
+/* ---------- settings ---------- */
 #settings {
     display: flex;
-    height: 70px;
+    align-items: center;
+    min-height: 70px;
+    padding-top: 1em;
+    font-size: 16px;
 }
 
-#settings-content {
-    display: flex;
+#panel {
+    display: none;
     align-items: center;
-    margin-left: 2em;
+    gap: .8em;
+    margin-left: 1em;
+    flex-wrap: wrap;
 }
 
-#gear {
+#panel.open {
     display: flex;
-    align-items: center;
+}
+
+#settings button {
+    font-size: 1.2em;
+    min-width: 2em;
+    padding: .2em .5em;
+    border: 0;
+    border-radius: .4em;
+    background: rgba(128, 128, 128, .2);
+    color: inherit;
     cursor: pointer;
 }
 
-#zoom {
+#panel label {
     display: flex;
     align-items: center;
+    gap: .4em;
 }
 
-#zoom div {
-    display: inline-block;
-    cursor: pointer;
-}
-
-#zoom #negative {
-    margin-left: 5px;
-}
-
-#switch {
-    display: flex;
-    align-items: center;
-}
-
-#switch .check-box {
-    display: flex;
-}
-
-.check-box label {
-    padding: 0 5px 0 50px;
-}
-
-.check-box input[type="checkbox"] {
+#panel input[type="checkbox"] {
     appearance: none;
     position: relative;
-    display: flex;
     width: 50px;
     height: 25px;
+    margin: 0;
     background: #ccc;
     border-radius: 50px;
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, .2);
     cursor: pointer;
-    transition: .4s;
+    transition: .3s;
 }
 
-.check-box input[type="checkbox"]:checked {
-    background: #059862;
+#panel input[type="checkbox"]:checked {
+    background: var(--ok);
 }
 
-.check-box input[type="checkbox"]::after {
+#panel input[type="checkbox"]::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 25px;
-    height: 25px;
+    top: 1px;
+    left: 1px;
+    width: 23px;
+    height: 23px;
     background: #fff;
     border-radius: 50%;
-    box-shadow: 0 0 5px rgba(0, 0, 0, .2);
-    transform: scale(1.1);
-    transition: .4s;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .3);
+    transition: .3s;
 }
 
-.check-box input[type="checkbox"]:checked::after {
-    left: 50%;
-}
-
-/* ---------- helpers for field content (not used by the templates themselves) ---------- */
-.nightMode .CFAL1 {
-    filter: invert(1);
-}
-
-label>span>p {
-    display: inline;
-}
-
-.table_container {
-    margin-top: 30px;
-    cursor: pointer;
-}
-
-table th,
-table td {
-    padding: 5px 15px !important;
-    border: solid 1px black;
-}
-
-.table-default-style {
-    border-collapse: collapse !important;
-    font-size: 1em;
-    margin-top: 10px;
-    max-width: 900px;
-}
-
-div[style="background-color: #5693d3; border-radius: 6px; padding: 5px;"] {
-    display: inline-block;
-    padding: 8px 10px !important;
-}
-
-div.num {
-    border-bottom: 1px solid;
-    text-align: center;
-    font-size: .8em;
-}
-
-div.denom {
-    border-top: 1px solid;
-    text-align: center;
-    font-size: .8em;
-}
-
-span.stacked {
-    display: inline-block;
-    margin: 0 5px;
+#panel input[type="checkbox"]:checked::after {
+    left: 26px;
 }
