@@ -6,10 +6,10 @@ Orixinal: https://github.com/muctebanesiri/anki-multiple-choice-question-templat
   <div style='font-family:"Arial";font-size:25px;font-weight:bold'>{{Question}}</div>
   <br>
   <form id="shuffle">
-    {{#option_1 (A)}}<div class="container" id="A"><input type="checkbox" name="radAnswer" class="checkbox" id="A"><div class="option">{{option_1 (A)}}</div></div>{{/option_1 (A)}}
-    {{#option_2 (B)}}<div class="container" id="B"><input type="checkbox" name="radAnswer" class="checkbox" id="B"><div class="option">{{option_2 (B)}}</div></div>{{/option_2 (B)}}
-    {{#option_3 (C)}}<div class="container" id="C"><input type="checkbox" name="radAnswer" class="checkbox" id="C"><div class="option">{{option_3 (C)}}</div></div>{{/option_3 (C)}}
-    {{#option_4 (D)}}<div class="container" id="D"><input type="checkbox" name="radAnswer" class="checkbox" id="D"><div class="option">{{option_4 (D)}}</div></div>{{/option_4 (D)}}
+    {{#option_1 (A)}}<div class="container" data-letter="A"><input type="checkbox" class="checkbox"><div class="option">{{option_1 (A)}}</div></div>{{/option_1 (A)}}
+    {{#option_2 (B)}}<div class="container" data-letter="B"><input type="checkbox" class="checkbox"><div class="option">{{option_2 (B)}}</div></div>{{/option_2 (B)}}
+    {{#option_3 (C)}}<div class="container" data-letter="C"><input type="checkbox" class="checkbox"><div class="option">{{option_3 (C)}}</div></div>{{/option_3 (C)}}
+    {{#option_4 (D)}}<div class="container" data-letter="D"><input type="checkbox" class="checkbox"><div class="option">{{option_4 (D)}}</div></div>{{/option_4 (D)}}
   </form>
   </div>
   <div id="settings">
@@ -45,267 +45,135 @@ Orixinal: https://github.com/muctebanesiri/anki-multiple-choice-question-templat
 <script>
 //--------------------------persistance
 if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var i=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",i);i>0&&n>0&&n-i<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
-//---------------------------variables
-var correctAnswer = "{{Answer}}".trim().toUpperCase();
-var Y = Number(correctAnswer);
-var k = "value";
-var answer =""
-var checkbox = document.getElementsByTagName("input");
-var option = document.getElementsByClassName("option");
-var container = document.getElementsByClassName("container");
-var DefElems = document.querySelectorAll('#shuffle > div');
-Persistence.setItem("scroll", 0)
-Persistence.setItem("answer", "")
 
-//---------------------------------remove empty elements
-var divs = document.querySelectorAll('.option');
-  divs.forEach(div => {
-    if (div.innerHTML === '') {
-      div.parentNode.remove();
-    }
-});
-//------------------------------------zoom
-if(Persistence.getItem("Zoom")==null){
-  Persistence.setItem("Zoom", 1)
-}
-var zoom = Persistence.getItem("Zoom");
-$('.front').css('zoom', zoom);
+(function () {
 
-$('#positive').on('click', function(){
-  zoom += 0.1;
-  Persistence.setItem("Zoom", zoom)
-  $('.front').css('zoom', zoom);
-});
-$('#default').on('click', function(){
-  zoom = 1;
-  Persistence.setItem("Zoom", zoom)
-  $('.front').css('zoom', zoom);
-});
-$('#negative').on('click', function(){
-  zoom -= 0.1;
-  Persistence.setItem("Zoom", zoom)
-  $('.front').css('zoom', zoom);
-});
-$('#gear').on('click', function(){
-  $('#settings-content').toggle(50);
-  setTimeout(
-  function()
-  {
-    $('#myCard').scrollTop($('#myCard')[0].scrollHeight);
-  }, 100)
-
-
-})
-
-//-------------------------------------functions
-document.getElementById("myCard").onscroll = function(){
-  var scrollPosition=document.getElementById("myCard").scrollTop
-  Persistence.setItem("scroll", scrollPosition)
-};
-
-function ToggleCheck() {
-  var mycheckBox = $("input[type='checkbox']#"+this.id);
-  var cont = $(".container#"+this.id);
-  mycheckBox.attr("checked", !mycheckBox.attr("checked"));
-  console.log("cont: " + cont)
-  cont.toggleClass("check")
-}
-
-
-function storeAnswerBox() {
-  answer=""
-  for (var i=0, iLen=option.length; i<iLen; i++) {
-    if (checkbox[i].checked) {
-
-      answer=answer+checkbox[i].id;
-    }
+  function toggle(el) {
+    const hidden = getComputedStyle(el).display === "none";
+    el.style.display = hidden ? "" : "none";
+    if (hidden && getComputedStyle(el).display === "none") el.style.display = "block";
   }
-  Persistence.setItem("answer",answer);
-  console.log("answer: " + answer)
 
-}
+  const $ = (sel) => document.querySelector(sel);
+  const card = $("#myCard");
+  const front = $(".front");
+  const form = $("#shuffle");
+  const settings = $("#settings-content");
+  const autoSubmit = $("#Auto_submit");
+  const shuffling = $("#Shuffling");
 
-function flipToBack() {
+  const correctAnswer = "{{Answer}}".trim().toUpperCase();
+  const singleAnswer = correctAnswer.length === 1;
 
-setTimeout(function() {
+  const load = (key, fallback) => {
+    const v = Persistence.getItem(key);
+    return v == null ? fallback : v;
+  };
 
-if (typeof pycmd !== "undefined") {
-      pycmd("ans")
-    } else {
-      if (typeof study !== "undefined") {
-        study.drawAnswer()
-      } else {
-        if (typeof AnkiDroidJS !== "undefined") {
-          showAnswer()
-        } else {
-          if (window.anki && window.sendMessage2) {
-            window.sendMessage2("ankitap", "midCenter")
-          }
-        }
+  Persistence.setItem("scroll", 0);
+  Persistence.setItem("answer", "");
+
+  //-------------------------- options
+  form.querySelectorAll(".option:empty").forEach((o) => o.parentNode.remove());
+  const items = Array.from(form.children); // original order
+
+  items.forEach((item) => {
+    const letter = document.createElement("span");
+    letter.className = "Letters";
+    letter.textContent = "(" + item.dataset.letter + ")\u00a0";
+    item.querySelector(".option").prepend(letter);
+  });
+
+  // Shuffle (or restore) the options by reordering the existing nodes.
+  // The "order<n>" values are written the same way as before for the back template.
+  function applyOrder(shuffled) {
+    const order = items.slice();
+    if (shuffled) {
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
       }
     }
-
-
-}, 50)}
-
-function shuffle(elems) {
-  allElems = (function() {
-    var ret = [],
-      l = elems.length;
-    while (l--) {
-      ret[ret.length] = elems[l];
-    }
-    return ret;
-  })();
-  var shuffled = (function() {
-      var l = allElems.length,
-        ret = [];
-      while (l--) {
-        var random = Math.floor(Math.random() * allElems.length),
-          randEl = allElems[random].cloneNode(true);
-        allElems.splice(random, 1);
-        ret[ret.length] = randEl;
-        Persistence.setItem("order"+l,random);
-        console.log("random: " + random);
-      }
-      return ret;
-    })(),
-    l = elems.length;
-  while (l--) {
-    elems[l].parentNode.insertBefore(shuffled[l], elems[l].nextSibling);
-    elems[l].parentNode.removeChild(elems[l]);
+    order.forEach((el) => form.appendChild(el));
+    form.querySelectorAll(".Letters").forEach((s) => (s.style.display = shuffled ? "none" : ""));
+    Persistence.setItem("order", order.map((i) => i.dataset.letter).join(""));
   }
 
-}
-
-function reverseShuffle(elems) {
-  allElems = (function() {
-
-    var ret = [],
-      l = DefElems.length;
-    while (l--) {
-      ret[ret.length] = DefElems[l];
-    }
-    return ret;
-
-  })();
-  console.log("allElems: " + allElems)
-
-var shuffled = (function() {
-      var l = allElems.length,
-        ret = [];
-      while (l--) {
-        var random = l,
-          randEl = allElems[random].cloneNode(true);
-        allElems.splice(random, 1);
-        ret[ret.length] = randEl;
-        Persistence.setItem("order"+l,random);
-        console.log("random: " + random);
-      }
-      return ret;
-    })(),
-    l = elems.length;
-  while (l--) {
-    elems[l].parentNode.insertBefore(shuffled[l], elems[l].nextSibling);
-    elems[l].parentNode.removeChild(elems[l]);
-  }
-}
-
-function HandleShufflingBox(){
-  Persistence.setItem("ShufflingBox", $("#Shuffling").is(":checked"));
-  if($("#Shuffling").is(":checked")){
-    shuffle(document.querySelectorAll('#shuffle > div'));
-    $(".Letters").remove();
-    HandelEvents();
-  }else{
-    reverseShuffle(document.querySelectorAll('#shuffle > div'));
-    HandelEvents();
+  //-------------------------- answering (one delegated listener)
+  function flipToBack() {
+    setTimeout(() => {
+      if (typeof pycmd !== "undefined") pycmd("ans");
+      else if (typeof study !== "undefined") study.drawAnswer();
+      else if (typeof AnkiDroidJS !== "undefined") showAnswer();
+      else if (window.anki && window.sendMessage2) window.sendMessage2("ankitap", "midCenter");
+    }, 50);
   }
 
-}
+  form.addEventListener("click", (e) => {
+    const item = e.target.closest(".container");
+    if (!item) return;
+    const box = item.querySelector("input");
+    if (e.target !== box) box.checked = !box.checked; // clicking the box itself already toggled it
+    item.classList.toggle("check", box.checked);
 
-function HandleSubmitBox(){
-  Persistence.setItem("SubmitBox", $("#Auto_submit").is(":checked"));
-  if($("#Auto_submit").is(":checked") && correctAnswer.length==1){
-    for (i = 0; i < container.length; i++) {
-    container[i].addEventListener("click", flipToBack);
-    }
-  }else{
-    for (i = 0; i < container.length; i++) {
-    container[i].removeEventListener("click", flipToBack);
-    }
+    const answer = items
+      .filter((i) => i.querySelector("input").checked)
+      .map((i) => i.dataset.letter)
+      .sort()
+      .join("");
+    Persistence.setItem("answer", answer);
+
+    if (autoSubmit.checked && singleAnswer) flipToBack();
+  });
+
+  //-------------------------- settings
+  shuffling.checked = load("ShufflingBox", false);
+  autoSubmit.checked = load("SubmitBox", true);
+
+  shuffling.addEventListener("change", () => {
+    Persistence.setItem("ShufflingBox", shuffling.checked);
+    applyOrder(shuffling.checked);
+  });
+  autoSubmit.addEventListener("change", () => {
+    Persistence.setItem("SubmitBox", autoSubmit.checked);
+  });
+  applyOrder(shuffling.checked);
+
+  //-------------------------- zoom
+  let zoom = load("Zoom", 1);
+  function setZoom(z) {
+    zoom = Math.max(0.3, Math.round(z * 10) / 10);
+    Persistence.setItem("Zoom", zoom);
+    front.style.zoom = zoom;
   }
+  setZoom(zoom);
+  $("#positive").onclick = () => setZoom(zoom + 0.1);
+  $("#default").onclick = () => setZoom(1);
+  $("#negative").onclick = () => setZoom(zoom - 0.1);
 
-}
-//------------------------------------------------
+  $("#gear").onclick = () => {
+    toggle(settings);
+    setTimeout(() => (card.scrollTop = card.scrollHeight), 100);
+  };
 
-if( Persistence.getItem("SubmitBox")==null || Persistence.getItem("ShufflingBox") ==null){
-  Persistence.setItem("SubmitBox", true);
-  Persistence.setItem("ShufflingBox", false);
-};
+  card.onscroll = () => Persistence.setItem("scroll", card.scrollTop);
 
-  for (i = 1; i < container.length+1; i++) {
-  $(".container:nth-of-type("+i+") .option").prepend("<span class='Letters'>("+String.fromCharCode(64+i)+")&nbsp;</span>");
+  //-------------------------- highlighting
+  document.addEventListener("mouseup", () => {
+    const sel = window.getSelection();
+    if (sel.isCollapsed || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!front.contains(range.commonAncestorContainer)) return;
+    const mark = document.createElement("span");
+    mark.className = "highlighted";
+    mark.appendChild(range.extractContents());
+    range.insertNode(mark);
+    sel.removeAllRanges();
+  });
 
-  }
-
-document.querySelector("#Shuffling").addEventListener("click",HandleShufflingBox)
-$("#Shuffling").prop("checked", Persistence.getItem("ShufflingBox"));
-
-document.querySelector("#Auto_submit").addEventListener("click",HandleSubmitBox)
-$("#Auto_submit").prop("checked", Persistence.getItem("SubmitBox"));
-
-if($("#Shuffling").is(":checked")){
-  shuffle(document.querySelectorAll('#shuffle > div'));
-  $(".Letters").remove();
-}else{
-}
-
-function HandelEvents(){
-
-if(correctAnswer.length==1  && $("#Auto_submit").is(":checked")){
-  for (i = 0; i < container.length; i++) {
-    container[i].addEventListener("click", ToggleCheck);
-    container[i].addEventListener("click", storeAnswerBox);
-    container[i].addEventListener("click", flipToBack);
-  }
-
-}else{
-  for (i = 0; i < container.length; i++) {
-    container[i].addEventListener("click", ToggleCheck);
-    container[i].addEventListener("click", storeAnswerBox);
-  }
-
-}
-
-}
-HandelEvents();
-
-/*  for (i = 0; i < container.length; i++) {
-    container[i].addEventListener("click", storeAnswer);
-    container[i].addEventListener("click", flipToBack);
-  };*/
-function deselect(){
-  $(this).replaceWith(this.innerHTML)
-  $(".highlighted").click(deselect)
-}
-
-$(document).on("mouseup", function (e) {
-    var selected = window.getSelection();
-
-    if (selected.toString().length > 0 && selected.rangeCount > 0) {
-        var range = selected.getRangeAt(0);
-        var newNode = document.createElement("span");
-
-        newNode.setAttribute("class", "highlighted");
-        newNode.addEventListener("click", deselect);
-
-        // Safely extract the selection (even across multiple tags) and wrap it
-        var fragment = range.extractContents();
-        newNode.appendChild(fragment);
-        range.insertNode(newNode);
-
-        selected.removeAllRanges();
-    }
-});
+  document.addEventListener("click", (e) => {
+    const mark = e.target.closest(".highlighted");
+    if (mark) mark.replaceWith(...mark.childNodes);
+  });
+})();
 </script>
