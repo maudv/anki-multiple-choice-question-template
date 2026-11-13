@@ -119,7 +119,7 @@ if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/"
     form.querySelectorAll(".Letters").forEach((s) => (s.style.display = shuffled ? "none" : ""));
   }
 
-  shuffling.checked = load("ShufflingBox", false);
+  shuffling.checked = load("ShufflingBox", true);
   shuffling.addEventListener("change", () => {
     Persistence.setItem("ShufflingBox", shuffling.checked);
     applyOrder(shuffling.checked);
