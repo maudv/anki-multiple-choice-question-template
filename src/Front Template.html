@@ -73,7 +73,7 @@ The .js file must exist in ~/.local/share/Anki2/User\ 1/collection.media/
     if (!item) return;
     items.forEach((o) => o.classList.toggle("selected", o === item));
     Persistence.setItem("answer", item.dataset.letter);
-    if (auto.checked) setTimeout(showAnswer, 150);
+    if (auto.checked) setTimeout(showAnswer, 50);
   });
 
   // ----- settings
