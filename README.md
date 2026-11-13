@@ -2,17 +2,6 @@
 
 This repository contains simple JavaScript, HTML, and CSS code for front and back cards, designed specifically for styling multiple choice questions in Anki. 
 
-![preview](https://github.com/muctebanesiri/anki-multiple-choise-question-template/assets/108553374/30477205-23b8-408c-a60e-52e3509bd7f1)
-
-### Watch Video Tutorial on YouTube
-
-<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-    <a href="https://www.youtube.com/watch?v=xgRmOmN_gjE" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block;">
-        <img src="https://img.youtube.com/vi/xgRmOmN_gjE/0.jpg" alt="video tutorial" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
-    </a>
-</div>
-
-
 ###  Instructions for Creating Cards
 
 If you wish to use these templates to create cards in the future, follow these steps:
@@ -34,7 +23,7 @@ If you wish to use these templates to create cards in the future, follow these s
 
 ###  Code Credits
 
-The original code was provided by Ashraf Nabil and u/12yardsfootball. I've made some modifications to ensure proper right-to-left (RTL) support for Persian, along with some other minor adjustments.
+This repo was forked from https://github.com/muctebanesiri/anki-multiple-choice-question-template/tree/main
 
 ###  Usage
 
