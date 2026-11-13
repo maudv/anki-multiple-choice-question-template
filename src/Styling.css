@@ -89,13 +89,13 @@
 }
 
 .back .option.correct::before {
-    content: "✓";
+    content: "✔";
     background: var(--ok);
     border-color: var(--ok);
 }
 
 .back .option.wrong::before {
-    content: "✗";
+    content: "✘";
     background: var(--bad);
     border-color: var(--bad);
 }
