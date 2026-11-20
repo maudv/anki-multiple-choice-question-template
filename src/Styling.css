@@ -108,13 +108,22 @@
 .explanation summary {
     cursor: pointer;
     color: var(--warn);
-    border-left: 4px solid var(--warn);
+    border-left: 4px solid transparent;
     padding-left: .5em;
 }
 
 .explanation>div {
+    margin-top: 1em;
     padding-left: .5em;
-    border-left: 4px solid transparent;
+    border-left: 4px solid var(--warn);
+}
+
+.explanation div th, td {
+    border-bottom: 1px solid #ddd;;
+}
+
+.explanation div tr:nth-child(even) {
+    background: #ffffff ;
 }
 
 /* ---------- settings ---------- */
